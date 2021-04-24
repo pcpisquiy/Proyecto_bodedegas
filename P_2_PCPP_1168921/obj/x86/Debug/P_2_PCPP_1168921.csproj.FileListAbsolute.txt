@@ -1,0 +1,8 @@
+C:\Users\pcpis\OneDrive - Universidad Rafael Landivar\Tareas\Programacion\Introduccion a la programacion\Programaciones\P_2_PCPP_1168921\P_2_PCPP_1168921\bin\Debug\P_2_PCPP_1168921.exe
+C:\Users\pcpis\OneDrive - Universidad Rafael Landivar\Tareas\Programacion\Introduccion a la programacion\Programaciones\P_2_PCPP_1168921\P_2_PCPP_1168921\bin\Debug\P_2_PCPP_1168921.pdb
+C:\Users\pcpis\OneDrive - Universidad Rafael Landivar\Tareas\Programacion\Introduccion a la programacion\Programaciones\P_2_PCPP_1168921\P_2_PCPP_1168921\obj\x86\Debug\P_2_PCPP_1168921.Form1.resources
+C:\Users\pcpis\OneDrive - Universidad Rafael Landivar\Tareas\Programacion\Introduccion a la programacion\Programaciones\P_2_PCPP_1168921\P_2_PCPP_1168921\obj\x86\Debug\P_2_PCPP_1168921.Properties.Resources.resources
+C:\Users\pcpis\OneDrive - Universidad Rafael Landivar\Tareas\Programacion\Introduccion a la programacion\Programaciones\P_2_PCPP_1168921\P_2_PCPP_1168921\obj\x86\Debug\P_2_PCPP_1168921.csproj.GenerateResource.Cache
+C:\Users\pcpis\OneDrive - Universidad Rafael Landivar\Tareas\Programacion\Introduccion a la programacion\Programaciones\P_2_PCPP_1168921\P_2_PCPP_1168921\obj\x86\Debug\P_2_PCPP_1168921.exe
+C:\Users\pcpis\OneDrive - Universidad Rafael Landivar\Tareas\Programacion\Introduccion a la programacion\Programaciones\P_2_PCPP_1168921\P_2_PCPP_1168921\obj\x86\Debug\P_2_PCPP_1168921.pdb
+C:\Users\pcpis\OneDrive - Universidad Rafael Landivar\Tareas\Programacion\Introduccion a la programacion\Programaciones\P_2_PCPP_1168921\P_2_PCPP_1168921\obj\x86\Debug\P_2_PCPP_1168921.csprojResolveAssemblyReference.cache

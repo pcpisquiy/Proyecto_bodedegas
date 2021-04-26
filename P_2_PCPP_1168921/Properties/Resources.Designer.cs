@@ -63,9 +63,9 @@ namespace P_2_PCPP_1168921.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap iroman {
+        internal static System.Drawing.Bitmap RH {
             get {
-                object obj = ResourceManager.GetObject("iroman", resourceCulture);
+                object obj = ResourceManager.GetObject("RH", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,9 +73,19 @@ namespace P_2_PCPP_1168921.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap pas {
+        internal static System.Drawing.Bitmap RN {
             get {
-                object obj = ResourceManager.GetObject("pas", resourceCulture);
+                object obj = ResourceManager.GetObject("RN", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap RS {
+            get {
+                object obj = ResourceManager.GetObject("RS", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

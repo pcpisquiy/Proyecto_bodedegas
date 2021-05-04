@@ -17,13 +17,14 @@ namespace P_2_PCPP_1168921
         #region Variables_globales
         string[,] configuracion;
         int[,] capacidad;
+        string[,] movimiento;
         int filas = 0;
         int columnas = 0;
-        string estanteria = "";
-        string tipo_robot = "";
-        int cont_rs = 1, cont_rh = 1, cont_rn = 1;
-        string pbconf_name="";
-        bool pasillo = true;
+        int filas_movimiento = 0;
+        List<Robot> robots;
+        int filaRobot1 = 0;
+        int columnaRobot1 = 0;
+        string valorAnteriorRobot = "";
         #endregion
         public Form1()
         {
@@ -91,9 +92,10 @@ namespace P_2_PCPP_1168921
                 //Abre un navegador para buscar el archivo
                 MessageBox.Show("Busque el archivo donde encuetra su configuración");
                 string FileToRead = "";
-                openFileDialog1.Filter = "txt files (*.txt)|*.txt";
-                openFileDialog1.ShowDialog();
-                FileToRead = openFileDialog1.FileName;
+                //openFileDialog1.Filter = "txt files (*.txt)|*.txt";
+                // openFileDialog1.ShowDialog();
+                // FileToRead = openFileDialog1.FileName;
+                FileToRead = "C:\\Users\\pcpis\\Desktop\\Configuracion.txt";
                 //lee y decompone el archivo en lineas
                 string conf = "";
                 using (StreamReader ReaderObject = new StreamReader(FileToRead))
@@ -152,9 +154,106 @@ namespace P_2_PCPP_1168921
                 return "";
             }
         }
+        public void Llenar_matriz_movimiento()
+        {
+            movimiento = new string[filas_movimiento, 5];
+            int fil = 0;
+            int col = 0;
+
+            for (int n = 0; n < movimiento.GetLength(0); n += 0)
+            {
+
+                if (configuracion[fil, col] == "C" || configuracion[fil, col] == "N" || configuracion[fil, col] == "F" || configuracion[fil, col] == "c" || configuracion[fil, col] == "f" || configuracion[fil, col] == "n")
+                {
+
+                    movimiento[n, 0] = fil.ToString();
+                    movimiento[n, 1] = col.ToString();
+                    movimiento[n, 2] = capacidad[fil, col].ToString();
+                    movimiento[n, 3] = configuracion[fil, col];
+                    movimiento[n, 4] = "0";
+                    n++;
+
+                }
+                col++;
+                if (col == columnas)
+                {
+                    fil++;
+                    col = 0;
+                }
+                if (fil == filas)
+                {
+                    break;
+                }
+
+
+            }
+        }
+        private void Llenar_GRILLA()
+        {
+            //DGVLAYAUT.RowCount = filas;
+            //DGVLAYAUT.ColumnCount = columnas;
+
+            DGVLAYAUT.Width = 60 * columnas + 40;
+            DGVLAYAUT.Height = 60 * filas + 40;
+
+            dataGridView2.RowCount = movimiento.GetLength(0);
+            dataGridView2.ColumnCount = 5;
+            for (int y = 0; y < columnas; y++)
+            {
+                DataGridViewColumn columnas_grid = new DataGridViewImageColumn();
+                DGVLAYAUT.Columns.Add(columnas_grid);
+            }
+            DGVLAYAUT.Rows.Add(filas);
+
+
+            for (int y = 0; y < filas; y++)
+            {
+                DGVLAYAUT.Rows[y].HeaderCell.Value = y.ToString();
+
+                for (int x = 0; x < columnas; x++)
+                {
+                    DGVLAYAUT.Rows[y].Cells[x].Value = Cargar_imagen(configuracion[y, x]);
+                    DGVLAYAUT.Rows[y].Height = 55;
+                    DGVLAYAUT.Columns[x].Width = 55;
+
+                }
+            }
+            for (int y = 0; y < filas; y++)
+            {
+                for (int x = 0; x < columnas; x++)
+                {
+                    if (configuracion[y, x] == "RS")
+                    {
+                        filaRobot1 = y;
+                        columnaRobot1 = x;
+
+                    }
+
+                }
+            }
+            foreach (DataGridViewColumn column in DGVLAYAUT.Columns)
+            {
+
+                column.HeaderText = column.Index.ToString();
+            }
+
+            for (int posY = 0; posY < movimiento.GetLength(0); posY++)
+            {
+
+                for (int posX = 0; posX < 5; posX++)
+                {
+                    dataGridView2.Rows[posY].Cells[posX].Value = movimiento[posY, posX].ToString();
+
+                }
+            }
+
+        }
 
         private void Cargar_Configuracion()
         {
+            filas = 0;
+            columnas = 0;
+            filas_movimiento = 0;
             bool estado = false;
             string cadena_conf = leer_archivo(ref estado).ToString();
             string cadena_guardar = "";
@@ -180,7 +279,14 @@ namespace P_2_PCPP_1168921
                         //guarda el caracter en la matriz
                         if (cadena_guardar != " " && cadena_guardar != "")
                         {
-                            configuracion[posicion_matrizy, posicion_matrizx] = cadena_guardar.ToString();
+                            if (cadena_guardar.Contains("E") || cadena_guardar.Contains("e") || cadena_guardar.Contains("C") || cadena_guardar.Contains("c") || cadena_guardar.Contains("N") || cadena_guardar.Contains("n") || cadena_guardar.Contains("F") || cadena_guardar.Contains("f") || cadena_guardar.Contains("P") || cadena_guardar.Contains("p") || cadena_guardar.Contains("w") || cadena_guardar.Contains("W"))
+                            {
+                                configuracion[posicion_matrizy, posicion_matrizx] = cadena_guardar.Substring(0, 1);
+                            }
+                            if (cadena_guardar == "rs" || cadena_guardar == "RS" || cadena_guardar == "RH" || cadena_guardar == "rh" || cadena_guardar == "RN" || cadena_guardar == "rn")
+                            {
+                                configuracion[posicion_matrizy, posicion_matrizx] = cadena_guardar.Substring(0, 2);
+                            }
                             //guarda las capacidades de las bodegas y ignora los pasillos
                             if (cadena_guardar == "p" || cadena_guardar == "P" || cadena_guardar == "E" || cadena_guardar == "e" || cadena_guardar == "w" || cadena_guardar == "W" || cadena_guardar == "RS" || cadena_guardar == "rs" || cadena_guardar == "RH" || cadena_guardar == "rh" || cadena_guardar == "RN" || cadena_guardar == "rn")
                             {
@@ -201,8 +307,6 @@ namespace P_2_PCPP_1168921
                                 }
 
                             }
-
-
                         }
                         //detiene el conteo de columnas al terminar una fila 
                         if (posicion_matrizx == columnas)
@@ -216,52 +320,21 @@ namespace P_2_PCPP_1168921
                             break;
                         }
                     }
-                    dataGridView1.RowCount = filas;
-                    dataGridView1.ColumnCount = columnas;
-                    dataGridView2.RowCount = filas;
-                    dataGridView2.ColumnCount = columnas;
-                    //descompone la matriz para colorear los picbox
-                    for (int y = 0; y < filas; y++)
+
+                    for (int y = 0; y < configuracion.GetLength(0); y++)
                     {
-                        for (int x = 0; x < columnas; x++)
+                        for (int x = 0; x < configuracion.GetLength(1); x++)
                         {
-
-                            string dato_configuracion=configuracion[y, x].ToString();
-                            if (dato_configuracion == "RS" || dato_configuracion == "rs" || dato_configuracion == "RH" || dato_configuracion == "rh" || dato_configuracion == "RN" || dato_configuracion == "rn")
+                            if (configuracion[y, x] == "F" || configuracion[y, x] == "f" || configuracion[y, x] == "c" || configuracion[y, x] == "C" || configuracion[y, x] == "N" || configuracion[y, x] == "n")
                             {
-                                // utliza reflexion para poder convertir un string a picturebox ya que tienen un nombre que tiene la raiz en común
-                                pbconf_name = "Pbconfi" + y.ToString() + "_" + x.ToString();
-                                PictureBox picconf = this.Controls.Find(pbconf_name, true).FirstOrDefault() as PictureBox;
-                                picconf.BackColor = Codigo_color("P", ref pasillo);
-                                picconf.Enabled = pasillo;
-                                picconf.Visible = true;
-                                //añade picture box en tiempo de ejecicion para poder añadir los robors que el usuario queira
-                                int posx = picconf.Location.X;
-                                int posy = picconf.Location.Y;
-                                Tipo_Robot(dato_configuracion,ref tipo_robot);
-                                PictureBox robot = new PictureBox();
-                                Cargar_imagen_Tipo_Robot(dato_configuracion,ref robot, posx, posy);
-                                this.Controls.Add(robot);
-                                robot.BringToFront();
+                                filas_movimiento++;
                             }
-                            else {
-                                // utliza reflexion para poder convertir un string a picturebox ya que tienen un nombre que tiene la raiz en común
-                                pbconf_name = "Pbconfi" + y.ToString() + "_" + x.ToString();
-                                PictureBox picconf = this.Controls.Find(pbconf_name, true).FirstOrDefault() as PictureBox;
-                                picconf.BackColor = Codigo_color(dato_configuracion, ref pasillo);
-                                picconf.Enabled = pasillo;
-                                picconf.Visible = true;
-                            }
-                            
-
-
-                            dataGridView1.Rows[y].Cells[x].Value = configuracion[y, x].ToString();
-                            dataGridView2.Rows[y].Cells[x].Value = capacidad[y, x].ToString();
-
-                        
-
                         }
                     }
+
+                    Llenar_matriz_movimiento();
+                    Llenar_GRILLA();
+
 
                     MessageBox.Show("Configuracion cargada exitosamente", "GESTOR BODEGA", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 
@@ -269,7 +342,6 @@ namespace P_2_PCPP_1168921
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.ToString());
-                    Application.Exit();
                 }
             }
             else
@@ -278,203 +350,149 @@ namespace P_2_PCPP_1168921
                 Application.Exit();
             }
         }
-        //funcion que retorna colores de pende el tipo de cuadro 
-        private Color Codigo_color(string Estanteria, ref bool pasillo)
+
+        private Image Cargar_imagen(string tipo)
         {
-            if (Estanteria.Contains("c") || Estanteria.Contains("C"))
+            if (tipo == "F" || tipo == "f")
             {
-                pasillo = false;
-                return Color.SkyBlue;
+                return imagenes_interfaz.Images[0];
+
 
             }
-            else if (Estanteria.Contains("f") || Estanteria.Contains("F"))
+            else if (tipo.ToUpper() == "C")
             {
-                pasillo = false;
-                return Color.Coral;
+                return imagenes_interfaz.Images[1];
 
             }
-            else if (Estanteria.Contains("N") || Estanteria.Contains("n"))
+            else if (tipo.ToUpper() == "W")
             {
-                pasillo = false;
-                return Color.Yellow;
+                return imagenes_interfaz.Images[2];
+            }
+            else if (tipo.ToUpper() == "E")
+            {
+                return imagenes_interfaz.Images[3];
+            }
+            else if (tipo.ToUpper() == "N")
+            {
+                return imagenes_interfaz.Images[4];
 
             }
-            else if (Estanteria.Contains("w") || Estanteria.Contains("W"))
+            else if (tipo.ToUpper() == "P")
             {
-                pasillo = false;
-                return Color.Black;
+                return imagenes_interfaz.Images[5];
+
 
             }
-            else if ((Estanteria.Contains("e") || Estanteria.Contains("E")))
+            else if (tipo.ToUpper() == "RH")
             {
-                pasillo = true;
-                return Color.White;
+                return imagenes_interfaz.Images[6];
+
 
             }
-            else if ((Estanteria.Contains("p") || Estanteria.Contains("P")))
+            else if (tipo.ToUpper() == "RN")
             {
-                pasillo = true;
-                return Color.Gray;
+                return imagenes_interfaz.Images[7];
+
 
             }
-            else
+            else if (tipo.ToUpper() == "RS")
             {
-                pasillo = false;
-                return Color.Transparent;
+                return imagenes_interfaz.Images[8];
 
-            }
-
-        } 
-        //funcion que da nombre a los picturbox que contienen a los robots
-        private void Tipo_Robot(string tipo_robot, ref string pic_tipo_robot)
-        {
-            
-            
-           if (tipo_robot == "RS" || tipo_robot == "rs")
-            {
-
-                tipo_robot = "RS" +"_"+ cont_rs.ToString();
-                cont_rs++;
-            }
-            else if (tipo_robot == "RH" || tipo_robot == "rh")
-            {
-                tipo_robot = "RH" + "_" + cont_rn.ToString();
-                cont_rh++;
-
-            }
-            else if (tipo_robot == "RN" || tipo_robot == "rn")
-            {
-
-                tipo_robot = "RN" + "_" + cont_rn.ToString();
-                cont_rn++;
-            }
-            else
-            {
-                MessageBox.Show("ERROR INGRESO UN ROBOT INVALIDO");
-                Application.Exit();
-
-            }
-
-        }
-        // crea las configuraciones que tendran los picturebox de los robots
-        private void Cargar_imagen_Tipo_Robot(string tipo_robot,ref PictureBox pic_tipo_robot, int posx,int posy)
-        {
-            if (tipo_robot.Contains("RS")||tipo_robot.Contains("rs"))
-            {
-                pic_tipo_robot.Name = tipo_robot;
-                pic_tipo_robot.Location = new Point(posx,posy);
-                pic_tipo_robot.Width = 50;
-                pic_tipo_robot.Height = 50;
-                pic_tipo_robot.Location = new Point(posx, posy);
-                pic_tipo_robot.SizeMode = PictureBoxSizeMode.StretchImage;
-                pic_tipo_robot.Image = Properties.Resources.RS;
-                pic_tipo_robot.Visible = true;
-                pic_tipo_robot.Enabled = false;
-            }
-            else if (tipo_robot.Contains("RH") || tipo_robot.Contains("rh"))
-            {
-                pic_tipo_robot.Name = tipo_robot;
-                pic_tipo_robot.Location = new Point(posx,posy);
-                pic_tipo_robot.Width = 50;
-                pic_tipo_robot.Height = 50;
-                pic_tipo_robot.SizeMode = PictureBoxSizeMode.StretchImage;
-                pic_tipo_robot.Image = Properties.Resources.RH;
-                pic_tipo_robot.Visible = true;
-                pic_tipo_robot.Enabled = false;
-            }
-            else if (tipo_robot.Contains("RN") || tipo_robot.Contains("rn"))
-            {
-                pic_tipo_robot.Name = tipo_robot;
-                pic_tipo_robot.Width = 50;
-                pic_tipo_robot.Height = 50;
-                pic_tipo_robot.Location = new Point(posx, posy);
-                pic_tipo_robot.SizeMode = PictureBoxSizeMode.StretchImage;
-                pic_tipo_robot.Image = Properties.Resources.RN;
-                pic_tipo_robot.Visible = true;
-                pic_tipo_robot.Enabled = false;
 
             }
             else
             {
                 MessageBox.Show("ERROR INGRESO UN ROBOT INVALIDO");
+                return null;
                 Application.Exit();
 
             }
 
         }
-       
+
+
         #endregion
 
         private void Form1_Load(object sender, EventArgs e)
         {
             Cargar_Configuracion();
+            //robots = new List<Robot> { new Robot { estado = true, Width = 55, Height = 55, imagen = Properties.Resources.RH, nombre = "Robot1" } };
+            //robots.Add(new Robot { estado = true, Width = 55, Height = 55, imagen = Properties.Resources.RN, nombre = "Robot2" });
+            //robots.Add(new Robot { estado = true, Width = 55, Height = 55, imagen = Properties.Resources.RX, nombre = "Robot3" });
+            //robots.Add(new Robot { estado = false, Width = 55, Height = 55, imagen = Properties.Resources.RS, nombre = "Robot4" });
+            //Bitmap img;
+            //img = new Bitmap(@"c:\images\mousepad.jpg");
+            //// Create the DGV with an Image column
+            //DataGridView dgv = new DataGridView();
+            //this.Controls.Add(dgv);
+            //DataGridViewImageColumn imageCol = new DataGridViewImageColumn();
+            //dgv.Columns.Add(imageCol);
+            //// Add a row and set its value to the image
+            //dgv.Rows.Add();
+            //dgv.Rows[0].Cells[0].Value = img;
         }
 
-
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-
-            int[] cooredanas = new int[2];
-            cooredanas = buscar_lugar(estanteria);
-            MessageBox.Show("Filas: " + cooredanas[0].ToString() + " Columnas: " + cooredanas[1].ToString());
-            if (configuracion[cooredanas[0] + 1, cooredanas[1]] == "p" || configuracion[cooredanas[0]+1, cooredanas[1] ] == "P" )
-            {
-                cooredanas[0] += 1;
-            }
-            else if (configuracion[cooredanas[0] - 1, cooredanas[1]] == "p" || configuracion[cooredanas[0] - 1, cooredanas[1]] == "P")
-            {
-                cooredanas[0] -= 1;
-            }
-            else if (configuracion[cooredanas[0] , cooredanas[1]+1] == "p" || configuracion[cooredanas[0] , cooredanas[1]+1] == "P")
-            {
-                cooredanas[1] += 1;
-            }
-            else if (configuracion[cooredanas[0], cooredanas[1] - 1] == "p" || configuracion[cooredanas[0], cooredanas[1] - 1] == "P")
-            {
-                cooredanas[1] -= 1;
-            }
-            else {
-                MessageBox.Show("El pasillo es inaccesible");
-            }
-            MessageBox.Show("Filas: " + cooredanas[0].ToString() + " Columnas: " + cooredanas[1].ToString());
-            timer1.Enabled = false;
-        }
-        private int[] buscar_lugar(string Nombre_estanteria)
-        {
-            int[] posiciones = new int[2];
-            for (int filas_estanterias = 0; filas_estanterias < filas; filas_estanterias++)
-            {
-                for (int columnas_estanterias = 0; columnas_estanterias < columnas; columnas_estanterias++)
-                {
-                    if (configuracion[filas_estanterias, columnas_estanterias].Contains(char.Parse(Nombre_estanteria.ToUpper())) || configuracion[filas_estanterias, columnas_estanterias].Contains(char.Parse(Nombre_estanteria.ToLower())) && capacidad[filas_estanterias, columnas_estanterias] > 0)
-                    {
-                        posiciones[0] = filas_estanterias;
-                        posiciones[1] = columnas_estanterias;
-                        columnas_estanterias = columnas;
-                        filas_estanterias = filas;
-                    }
-
-                }
-
-            }
-            return posiciones;
-        }
         private void button1_Click(object sender, EventArgs e)
         {
-            estanteria = Interaction.InputBox("Ingrese el tipo de estanteria que desea almacenar el porducto \nDonde c= Materiale frios \n f= Materiale fragiles \ny n= Materiale Normales", "GUARDAR");
-            if (estanteria == "" || estanteria != "c" && estanteria != "n" && estanteria != "f" && estanteria != "C" && estanteria != "N" && estanteria != "F")
-            {
-                MessageBox.Show("Ingrese una estanteria valida");
-            }
-            else {
-                timer1.Enabled = true;
-            }
-            
+            ACTIVIDAD_REALIZAR arealizar = new ACTIVIDAD_REALIZAR();
+            arealizar.ShowDialog();
+
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void HORA_ACTUAL_Tick(object sender, EventArgs e)
         {
-            timer1.Enabled = false;
+            label1.Text = "FECHA: " + DateTime.Now.Date.ToShortDateString() + " HORA: " + DateTime.Now.ToString("HH:mm:ss");
+        }
+
+        private void iNICIARNUEVABODEGAToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Cargar_Configuracion();
+        }
+        public void MoverRobotAleatoriamente()
+        {
+
+            Random rnd = new Random(DateTime.Now.Millisecond);
+            switch (rnd.Next() % 4)
+            {
+                case 0://arriba
+
+                    if (filaRobot1 > 0)
+                    {
+                        filaRobot1--;
+                        valorAnteriorRobot = configuracion[filaRobot1, columnaRobot1];
+                    }
+                    break;
+                case 1://abajo
+                    if (filaRobot1 < filas - 1)
+                    {
+                        filaRobot1++;
+                        valorAnteriorRobot = configuracion[filaRobot1, columnaRobot1];
+                    }
+                    break;
+                case 2://izquierda
+                    if (columnaRobot1 > 0)
+                    {
+                        columnaRobot1--;
+                        valorAnteriorRobot = configuracion[filaRobot1, columnaRobot1];
+                    }
+                    break;
+                case 3://derecha
+                    if (columnaRobot1 < columnas - 1)
+                    {
+                        columnaRobot1++;
+                        valorAnteriorRobot = configuracion[filaRobot1, columnaRobot1];
+                    }
+                    break;
+            }
+
+        }
+        private void Robot_Tick(object sender, EventArgs e)
+        {
+            MoverRobotAleatoriamente();
+
+            configuracion[filaRobot1, columnaRobot1] = "rs";
+            Llenar_GRILLA();
         }
 
 

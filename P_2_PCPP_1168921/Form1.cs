@@ -21,7 +21,6 @@ namespace P_2_PCPP_1168921
         int filas = 0;
         int columnas = 0;
         int filas_movimiento = 0;
-        List<Robot> robots;
         int filaRobot1 = 0;
         int columnaRobot1 = 0;
         string valorAnteriorRobot = "";
@@ -29,58 +28,6 @@ namespace P_2_PCPP_1168921
         public Form1()
         {
             InitializeComponent();
-        }
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
-        {
-            int posx = r1.Location.X;
-            int posy = r1.Location.Y;
-            int movposy = 0;
-            int movposx = 0;
-            Keys tecla = e.KeyCode;
-            switch (tecla)
-            {
-                case Keys.Down:
-                    posy += 5;
-                    r1.Location = new Point(posx, posy);
-                    movposy = 5;
-                    chocar(r1, posx, posy, movposy, movposx);
-                    break;
-                case Keys.Up:
-                    posy -= 5;
-                    r1.Location = new Point(posx, posy);
-                    movposy = -5;
-                    chocar(r1, posx, posy, movposy, movposx);
-                    break;
-                case Keys.Left:
-                    posx -= 5;
-                    r1.Location = new Point(posx, posy);
-                    movposx = -5;
-                    chocar(r1, posx, posy, movposy, movposx);
-                    break;
-                case Keys.Right:
-                    posx += 5;
-                    r1.Location = new Point(posx, posy);
-                    movposx = 5;
-                    chocar(r1, posx, posy, movposy, movposx);
-                    break;
-            }
-
-
-        }
-        public void chocar(PictureBox robot, int posx, int posy, int movposy, int movposx)
-        {
-            foreach (Control ctrl in this.Controls)
-            {
-                if (ctrl is PictureBox && ctrl != robot && ctrl.Enabled == false)
-                {
-                    if (robot.Bounds.IntersectsWith(ctrl.Bounds))
-                    {
-                        posx -= movposx;
-                        posy -= movposy;
-                        robot.Location = new Point(posx, posy);
-                    }
-                }
-            }
         }
         #region Carga la configuracion del layaout
 
@@ -92,10 +39,8 @@ namespace P_2_PCPP_1168921
                 //Abre un navegador para buscar el archivo
                 MessageBox.Show("Busque el archivo donde encuetra su configuración");
                 string FileToRead = "";
-                //openFileDialog1.Filter = "txt files (*.txt)|*.txt";
-                // openFileDialog1.ShowDialog();
-                // FileToRead = openFileDialog1.FileName;
-                FileToRead = "C:\\Users\\pcpis\\Desktop\\Configuracion.txt";
+                openFileDialog1.ShowDialog();
+                FileToRead = openFileDialog1.FileName;
                 //lee y decompone el archivo en lineas
                 string conf = "";
                 using (StreamReader ReaderObject = new StreamReader(FileToRead))
@@ -105,16 +50,17 @@ namespace P_2_PCPP_1168921
                     //lee cada linea del archivo 
                     while ((Line = ReaderObject.ReadLine()) != null)
                     {
+
                         //un contador para poder obtener el numero de filas al momento de leer la primera linea, esto lo hace al contar los espacios en blanco 
                         if (contador == 0)
                         {
                             //agrega un espacio en blanco(se pegan las linea si no se coloca el espacio en blanco)y la linea leida del archivo
-                            conf += Line + " ";
+                            conf += Line + ",";
                             //por cada linea leida suma una columna
                             filas++;
                             for (int l = 0; l < conf.Length; l++)
                             {
-                                if (conf[l].ToString() == " " || conf[l].ToString() == "")
+                                if (conf[l].ToString() == "," || conf[l].ToString() == "")
                                 {
                                     columnas++;
                                 }
@@ -125,7 +71,7 @@ namespace P_2_PCPP_1168921
                         //por cada linea leida suma una columna
                         else
                         {
-                            conf += Line + " ";
+                            conf += Line + ",";
                             filas++;
 
                         }
@@ -190,21 +136,14 @@ namespace P_2_PCPP_1168921
         }
         private void Llenar_GRILLA()
         {
-            //DGVLAYAUT.RowCount = filas;
-            //DGVLAYAUT.ColumnCount = columnas;
-
             DGVLAYAUT.Width = 60 * columnas + 40;
             DGVLAYAUT.Height = 60 * filas + 40;
-
-            dataGridView2.RowCount = movimiento.GetLength(0);
-            dataGridView2.ColumnCount = 5;
             for (int y = 0; y < columnas; y++)
             {
                 DataGridViewColumn columnas_grid = new DataGridViewImageColumn();
                 DGVLAYAUT.Columns.Add(columnas_grid);
             }
             DGVLAYAUT.Rows.Add(filas);
-
 
             for (int y = 0; y < filas; y++)
             {
@@ -215,35 +154,6 @@ namespace P_2_PCPP_1168921
                     DGVLAYAUT.Rows[y].Cells[x].Value = Cargar_imagen(configuracion[y, x]);
                     DGVLAYAUT.Rows[y].Height = 55;
                     DGVLAYAUT.Columns[x].Width = 55;
-
-                }
-            }
-            for (int y = 0; y < filas; y++)
-            {
-                for (int x = 0; x < columnas; x++)
-                {
-                    if (configuracion[y, x] == "RS")
-                    {
-                        filaRobot1 = y;
-                        columnaRobot1 = x;
-
-                    }
-
-                }
-            }
-            foreach (DataGridViewColumn column in DGVLAYAUT.Columns)
-            {
-
-                column.HeaderText = column.Index.ToString();
-            }
-
-            for (int posY = 0; posY < movimiento.GetLength(0); posY++)
-            {
-
-                for (int posX = 0; posX < 5; posX++)
-                {
-                    dataGridView2.Rows[posY].Cells[posX].Value = movimiento[posY, posX].ToString();
-
                 }
             }
 
@@ -267,7 +177,7 @@ namespace P_2_PCPP_1168921
                 {  //decompne la cadena de caracteres para llenar la matriz
                     for (int i = 0; i < cadena_conf.Length; i++)
                     {
-                        if (cadena_conf[i].ToString() == " ")
+                        if (cadena_conf[i].ToString() == ",")
                         {
                             cadena_guardar = "";
                             posicion_matrizx++;
@@ -277,25 +187,25 @@ namespace P_2_PCPP_1168921
                             cadena_guardar += cadena_conf[i].ToString();
                         }
                         //guarda el caracter en la matriz
-                        if (cadena_guardar != " " && cadena_guardar != "")
+                        if (cadena_guardar != "," && cadena_guardar != "")
                         {
-                            if (cadena_guardar.Contains("E") || cadena_guardar.Contains("e") || cadena_guardar.Contains("C") || cadena_guardar.Contains("c") || cadena_guardar.Contains("N") || cadena_guardar.Contains("n") || cadena_guardar.Contains("F") || cadena_guardar.Contains("f") || cadena_guardar.Contains("P") || cadena_guardar.Contains("p") || cadena_guardar.Contains("w") || cadena_guardar.Contains("W"))
+                            if (cadena_guardar.ToUpper().Contains("E") || cadena_guardar.ToUpper().Contains("C") || cadena_guardar.ToUpper().Contains("N") || cadena_guardar.ToUpper().Contains("F") || cadena_guardar.ToUpper().Contains("P"))
                             {
                                 configuracion[posicion_matrizy, posicion_matrizx] = cadena_guardar.Substring(0, 1);
                             }
-                            if (cadena_guardar == "rs" || cadena_guardar == "RS" || cadena_guardar == "RH" || cadena_guardar == "rh" || cadena_guardar == "RN" || cadena_guardar == "rn")
+                            if (cadena_guardar == "rs" || cadena_guardar == "R++" || cadena_guardar == "R+-"  || cadena_guardar == "R--")
                             {
-                                configuracion[posicion_matrizy, posicion_matrizx] = cadena_guardar.Substring(0, 2);
+                                configuracion[posicion_matrizy, posicion_matrizx] = cadena_guardar.Substring(0, 3);
                             }
                             //guarda las capacidades de las bodegas y ignora los pasillos
-                            if (cadena_guardar == "p" || cadena_guardar == "P" || cadena_guardar == "E" || cadena_guardar == "e" || cadena_guardar == "w" || cadena_guardar == "W" || cadena_guardar == "RS" || cadena_guardar == "rs" || cadena_guardar == "RH" || cadena_guardar == "rh" || cadena_guardar == "RN" || cadena_guardar == "rn")
+                            if (cadena_guardar == "p" || cadena_guardar == "P" || cadena_guardar == "E" || cadena_guardar == "R++"  || cadena_guardar == "R+-" || cadena_guardar == "R--")
                             {
                                 capacidad[posicion_matrizy, posicion_matrizx] = 0;
                             }
                             else
                             {
                                 //llenar la matriz capacidad para poder saber cuantos elementos tiene
-                                if (cadena_guardar.Substring(1, cadena_guardar.Length - 1) == "")
+                                if (cadena_guardar.Substring(0, cadena_guardar.Length - 1) == "#" || cadena_guardar.Substring(0, cadena_guardar.Length - 1) == " ")
                                 {
                                     capacidad[posicion_matrizy, posicion_matrizx] = capacidad_guardar;
                                 }
@@ -317,25 +227,12 @@ namespace P_2_PCPP_1168921
                         //rompe el bucle si llega al limite de filas 
                         if (posicion_matrizy == filas)
                         {
+                            Llenar_matriz_movimiento();
+                            Llenar_GRILLA();
                             break;
+                           
                         }
                     }
-
-                    for (int y = 0; y < configuracion.GetLength(0); y++)
-                    {
-                        for (int x = 0; x < configuracion.GetLength(1); x++)
-                        {
-                            if (configuracion[y, x] == "F" || configuracion[y, x] == "f" || configuracion[y, x] == "c" || configuracion[y, x] == "C" || configuracion[y, x] == "N" || configuracion[y, x] == "n")
-                            {
-                                filas_movimiento++;
-                            }
-                        }
-                    }
-
-                    Llenar_matriz_movimiento();
-                    Llenar_GRILLA();
-
-
                     MessageBox.Show("Configuracion cargada exitosamente", "GESTOR BODEGA", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 
                 }
@@ -353,7 +250,7 @@ namespace P_2_PCPP_1168921
 
         private Image Cargar_imagen(string tipo)
         {
-            if (tipo == "F" || tipo == "f")
+            if (tipo.ToUpper() == "F")
             {
                 return imagenes_interfaz.Images[0];
 
@@ -363,10 +260,6 @@ namespace P_2_PCPP_1168921
             {
                 return imagenes_interfaz.Images[1];
 
-            }
-            else if (tipo.ToUpper() == "W")
-            {
-                return imagenes_interfaz.Images[2];
             }
             else if (tipo.ToUpper() == "E")
             {
@@ -383,19 +276,19 @@ namespace P_2_PCPP_1168921
 
 
             }
-            else if (tipo.ToUpper() == "RH")
+            else if (tipo.ToUpper() == "R++")
             {
                 return imagenes_interfaz.Images[6];
 
 
             }
-            else if (tipo.ToUpper() == "RN")
+            else if (tipo.ToUpper() == "R+-")
             {
                 return imagenes_interfaz.Images[7];
 
 
             }
-            else if (tipo.ToUpper() == "RS")
+            else if (tipo.ToUpper() == "R--")
             {
                 return imagenes_interfaz.Images[8];
 
@@ -404,9 +297,8 @@ namespace P_2_PCPP_1168921
             else
             {
                 MessageBox.Show("ERROR INGRESO UN ROBOT INVALIDO");
-                return null;
                 Application.Exit();
-
+                return null;
             }
 
         }
@@ -417,20 +309,7 @@ namespace P_2_PCPP_1168921
         private void Form1_Load(object sender, EventArgs e)
         {
             Cargar_Configuracion();
-            //robots = new List<Robot> { new Robot { estado = true, Width = 55, Height = 55, imagen = Properties.Resources.RH, nombre = "Robot1" } };
-            //robots.Add(new Robot { estado = true, Width = 55, Height = 55, imagen = Properties.Resources.RN, nombre = "Robot2" });
-            //robots.Add(new Robot { estado = true, Width = 55, Height = 55, imagen = Properties.Resources.RX, nombre = "Robot3" });
-            //robots.Add(new Robot { estado = false, Width = 55, Height = 55, imagen = Properties.Resources.RS, nombre = "Robot4" });
-            //Bitmap img;
-            //img = new Bitmap(@"c:\images\mousepad.jpg");
-            //// Create the DGV with an Image column
-            //DataGridView dgv = new DataGridView();
-            //this.Controls.Add(dgv);
-            //DataGridViewImageColumn imageCol = new DataGridViewImageColumn();
-            //dgv.Columns.Add(imageCol);
-            //// Add a row and set its value to the image
-            //dgv.Rows.Add();
-            //dgv.Rows[0].Cells[0].Value = img;
+
         }
 
         private void button1_Click(object sender, EventArgs e)
